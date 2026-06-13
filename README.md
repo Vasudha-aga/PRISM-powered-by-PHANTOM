@@ -15,12 +15,27 @@ An AI-driven reverse logistics platform that intelligently grades returned produ
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Next.js 15, React 19, TypeScript, Tailwind CSS, Framer Motion, Zustand |
-| Backend | FastAPI, Python, Pydantic, Pillow |
-| State Management | Zustand |
-| HTTP Client | Axios |
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="50%">
+        <h3>Frontend</h3>
+        <img src="https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=nextdotjs" alt="Next.js" /><br/><br/>
+        <img src="https://img.shields.io/badge/React-19-0055FF?style=for-the-badge&logo=react" alt="React" /><br/><br/>
+        <img src="https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" /><br/><br/>
+        <img src="https://img.shields.io/badge/Framer_Motion-11.0-0055FF?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion" /><br/><br/>
+        <img src="https://img.shields.io/badge/Zustand-4.5-black?style=for-the-badge&logo=react" alt="Zustand" />
+      </td>
+      <td align="center" width="50%">
+        <h3>Backend</h3>
+        <img src="https://img.shields.io/badge/FastAPI-0.109-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" /><br/><br/>
+        <img src="https://img.shields.io/badge/Python-3.10-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" /><br/><br/>
+        <img src="https://img.shields.io/badge/Pydantic-2.0-E92063?style=for-the-badge&logo=pydantic&logoColor=white" alt="Pydantic" /><br/><br/>
+        <img src="https://img.shields.io/badge/Axios-1.6-5A29E4?style=for-the-badge&logo=axios&logoColor=white" alt="Axios" />
+      </td>
+    </tr>
+  </table>
+</div>
 
 ## How to Run
 
