@@ -2,16 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { motion, useSpring, useTransform } from "framer-motion";
-import { api } from "@/lib/api";
-import { Leaf, Trees, Recycle, Zap } from "lucide-react";
-
-interface ImpactResponse {
-  carbon_saved: number;
-  waste_diverted: number;
-  products_reused: number;
-  green_credits: number;
-  trees_equivalent: number;
-}
+import { apiService } from "@/services/api";
+import { ImpactResponse } from "@/types/api";
+import { Leaf, Trees, Recycle, Zap, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 // Custom hook for animated counter
 function AnimatedCounter({ value, decimals = 0 }: { value: number, decimals?: number }) {
@@ -30,25 +24,52 @@ function AnimatedCounter({ value, decimals = 0 }: { value: number, decimals?: nu
 
 export default function ImpactPage() {
   const [data, setData] = useState<ImpactResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await api.get("/impact");
-        setData(res.data);
-      } catch (error) {
-        console.error(error);
-        setData({
-          carbon_saved: 3.2,
-          waste_diverted: 1,
-          products_reused: 1,
-          green_credits: 50,
-          trees_equivalent: 0.15
-        });
+        const res = await apiService.getImpact();
+        setData(res);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to calculate sustainability impact. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Leaf className="w-16 h-16 text-success animate-pulse" />
+          <p className="text-xl font-medium tracking-widest uppercase">Calculating Sustainability Impact...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-32 pb-20 px-4">
+        <motion.div 
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          className="w-full max-w-lg flex flex-col items-center justify-center border border-red-500/20 rounded-3xl bg-red-50/50 backdrop-blur-sm p-8 text-center"
+        >
+          <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
+          <h3 className="text-xl font-bold text-red-700 mb-2">Impact Error</h3>
+          <p className="text-red-600/80 mb-6">{error}</p>
+          <Button onClick={() => window.location.reload()} variant="outline" className="border-red-200 text-red-600 hover:bg-red-50">
+            Retry
+          </Button>
+        </motion.div>
+      </div>
+    );
+  }
 
   if (!data) return null;
 
