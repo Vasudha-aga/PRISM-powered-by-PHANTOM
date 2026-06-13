@@ -19,6 +19,7 @@ class PhantomResponse(BaseModel):
     return_reason_score: int
     sustainability_score: int
     asset_class: str
+    reasoning: list[str]
 
 
 class DecisionResponse(BaseModel):
@@ -27,3 +28,4 @@ class DecisionResponse(BaseModel):
     reasons: list[str]
     carbon_saved: float
     green_credits: int
+    reasoning: list[str]

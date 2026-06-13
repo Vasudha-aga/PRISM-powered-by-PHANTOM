@@ -34,8 +34,10 @@ export const apiService = {
     return response.data;
   },
 
-  async getPassport(): Promise<PassportResponse> {
-    const response = await api.get<PassportResponse>("/passport");
+  async getPassport(params?: { decision?: string }): Promise<PassportResponse> {
+    const response = await api.get<PassportResponse>("/passport", {
+      params: params?.decision ? { decision: params.decision } : undefined,
+    });
     return response.data;
   },
 
@@ -44,8 +46,14 @@ export const apiService = {
     return response.data;
   },
 
-  async getSwap(): Promise<SwapResponse> {
-    const response = await api.get<SwapResponse>("/swap");
+  async getSwap(params?: { product_name?: string; category?: string; condition_description?: string }): Promise<SwapResponse> {
+    const response = await api.get<SwapResponse>("/swap", {
+      params: {
+        product_name: params?.product_name || "Unknown Product",
+        category: params?.category || "Other",
+        condition_description: params?.condition_description || undefined,
+      },
+    });
     return response.data;
   }
 };

@@ -1,6 +1,4 @@
-"""PHANTOM scoring service — encapsulates the scoring logic."""
-
-import random
+"""PHANTOM scoring service — deterministic scoring logic."""
 
 
 class PhantomScorer:
@@ -9,6 +7,22 @@ class PhantomScorer:
     CONDITION_SCORES = {"A": 28, "B": 22, "C": 15, "D": 8}
     RESALE_VALUES = {"A": 19, "B": 15, "C": 10, "D": 5}
     REPAIR_COSTS = {"A": 10, "B": 8, "C": 5, "D": 2}
+
+    DEMAND_SCORES = {
+        "electronics": 18,
+        "clothing": 15,
+        "apparel": 15,
+        "footwear": 16,
+        "books": 10,
+    }
+
+    SUSTAINABILITY_SCORES = {
+        "electronics": 8,
+        "clothing": 10,
+        "apparel": 10,
+        "footwear": 9,
+        "books": 9,
+    }
 
     def __init__(self, grade: str, category: str, return_reason: str):
         self.grade = grade.upper()
@@ -21,12 +35,9 @@ class PhantomScorer:
 
     def demand_score(self) -> int:
         """Score out of 20 based on category demand."""
-        if "electronic" in self.category:
-            return 18
-        elif "clothing" in self.category or "apparel" in self.category:
-            return 15
-        elif "book" in self.category:
-            return 10
+        for key, value in self.DEMAND_SCORES.items():
+            if key in self.category:
+                return value
         return 12
 
     def resale_value(self) -> int:
@@ -39,7 +50,7 @@ class PhantomScorer:
 
     def return_reason_score(self) -> int:
         """Score out of 10 based on return reason."""
-        if "color" in self.reason or "size" in self.reason:
+        if "color" in self.reason or "size" in self.reason or "fit" in self.reason:
             return 9
         elif "defect" in self.reason or "broken" in self.reason:
             return 3
@@ -47,7 +58,10 @@ class PhantomScorer:
 
     def sustainability_score(self) -> int:
         """Score out of 10 promoting green recovery."""
-        return random.randint(8, 10)
+        for key, value in self.SUSTAINABILITY_SCORES.items():
+            if key in self.category:
+                return value
+        return 9
 
     def total_score(self) -> int:
         """Composite PHANTOM score out of 100."""
