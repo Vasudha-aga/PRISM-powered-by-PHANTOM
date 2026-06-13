@@ -4,10 +4,7 @@ An AI-driven reverse logistics platform that intelligently grades returned produ
 
 <br/>
 
-<div align="center">
-  <table>
-    <tr>
-      <td align="center" width="50%">
+<div align="center">    
         <img src="https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=nextdotjs" alt="Next.js" />
         <img src="https://img.shields.io/badge/React-19-0055FF?style=for-the-badge&logo=react" alt="React" />
         <img src="https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
@@ -17,9 +14,6 @@ An AI-driven reverse logistics platform that intelligently grades returned produ
         <img src="https://img.shields.io/badge/Python-3.10-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
         <img src="https://img.shields.io/badge/Pydantic-2.0-E92063?style=for-the-badge&logo=pydantic&logoColor=white" alt="Pydantic" />
         <img src="https://img.shields.io/badge/Axios-1.6-5A29E4?style=for-the-badge&logo=axios&logoColor=white" alt="Axios" />
-      </td>
-    </tr>
-  </table>
 </div>
 
 <br/>
