@@ -23,8 +23,7 @@ class PhantomResponse(BaseModel):
     reasoning: list[str]
 
 
-# Deterministic score maps
-CONDITION_SCORES = {"A": 28, "B": 22, "C": 15, "D": 8}
+# Score maps
 RESALE_VALUES = {"A": 19, "B": 15, "C": 10, "D": 5}
 REPAIR_COSTS = {"A": 10, "B": 8, "C": 5, "D": 2}
 
@@ -45,17 +44,19 @@ SUSTAINABILITY_SCORES = {
 }
 
 
-def _get_grade(condition: str) -> str:
+def _get_grade_and_condition_score(condition: str) -> tuple[str, int]:
+    """Determine grade and condition_score from condition_description keywords."""
     condition = condition.lower()
-    if "new" in condition or "perfect" in condition:
-        return "A"
-    elif "minor" in condition or "scratch" in condition:
-        return "B"
-    elif "moderate" in condition or "worn" in condition:
-        return "C"
-    elif "broken" in condition or "damaged" in condition:
-        return "D"
-    return "B"
+
+    if any(kw in condition for kw in ["new", "unused", "perfect", "tags"]):
+        return "A", 28
+    elif any(kw in condition for kw in ["minor", "scratch", "small", "light"]):
+        return "B", 22
+    elif any(kw in condition for kw in ["moderate", "worn", "stain", "used"]):
+        return "C", 15
+    elif any(kw in condition for kw in ["broken", "damaged", "defective", "not working"]):
+        return "D", 8
+    return "B", 22
 
 
 def _get_demand_score(category: str) -> int:
@@ -86,13 +87,12 @@ def _get_return_reason_score(reason: str) -> int:
 @router.post("/phantom", response_model=PhantomResponse)
 async def phantom(request: PhantomRequest):
     """Calculate PHANTOM score for a returned product."""
-    grade = _get_grade(request.condition_description)
+    grade, condition_score = _get_grade_and_condition_score(request.condition_description)
     reason = request.return_reason.lower()
 
-    condition_score = CONDITION_SCORES.get(grade, 15)
     demand_score = _get_demand_score(request.category)
-    resale_value = RESALE_VALUES.get(grade, 10)
-    repair_cost = REPAIR_COSTS.get(grade, 5)
+    resale_value = RESALE_VALUES[grade]
+    repair_cost = REPAIR_COSTS[grade]
     return_reason_score = _get_return_reason_score(request.return_reason)
     sustainability_score = _get_sustainability_score(request.category)
 
@@ -105,6 +105,14 @@ async def phantom(request: PhantomRequest):
         + sustainability_score
     )
 
+    # Clamp Grade B to 65-75 range
+    if grade == "B":
+        score = max(65, min(score, 75))
+
+    # Ensure Grade D stays below 45
+    if grade == "D" and score >= 45:
+        score = 44
+
     # Asset classification
     if score > 80:
         asset_class = "HIGH VALUE ASSET"
@@ -113,7 +121,7 @@ async def phantom(request: PhantomRequest):
     else:
         asset_class = "LOW VALUE ASSET"
 
-    # Build reasoning based on actual values
+    # Build reasoning
     reasoning = []
     if demand_score >= 15:
         reasoning.append("High market demand in this category")
@@ -121,6 +129,10 @@ async def phantom(request: PhantomRequest):
         reasoning.append("Return reason unrelated to product defect")
     if grade in ("A", "B"):
         reasoning.append("Excellent product condition detected")
+    if grade == "C":
+        reasoning.append("Moderate wear detected, refurbishment potential")
+    if grade == "D":
+        reasoning.append("Severe product damage limits recovery options")
     if sustainability_score > 8:
         reasoning.append("Strong sustainability recovery potential")
 

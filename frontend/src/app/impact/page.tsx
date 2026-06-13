@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import { motion, useSpring, useTransform } from "framer-motion";
 import { apiService } from "@/services/api";
 import { ImpactResponse } from "@/types/api";
+import { useAppStore } from "@/store/useAppStore";
 import { Leaf, Trees, Recycle, Zap, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 // Custom hook for animated counter
 function AnimatedCounter({ value, decimals = 0 }: { value: number, decimals?: number }) {
@@ -27,10 +29,22 @@ export default function ImpactPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const phantomData = useAppStore((state) => state.phantomData);
+  const decisionData = useAppStore((state) => state.decisionData);
+  const productData = useAppStore((state) => state.productData);
+
   useEffect(() => {
+    if (!productData) {
+      setLoading(false);
+      return;
+    }
     const fetchData = async () => {
       try {
-        const res = await apiService.getImpact();
+        const res = await apiService.getImpact({
+          phantom_score: phantomData?.score ?? 50,
+          decision: decisionData?.decision || "Resale",
+          category: productData?.category || "Other",
+        });
         setData(res);
       } catch (err) {
         console.error(err);
@@ -40,7 +54,25 @@ export default function ImpactPage() {
       }
     };
     fetchData();
-  }, []);
+  }, [phantomData, decisionData, productData]);
+
+  if (!loading && !productData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-32 pb-20 px-4">
+        <motion.div
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          className="w-full max-w-lg flex flex-col items-center justify-center border border-border rounded-3xl bg-white/50 backdrop-blur-sm p-8 text-center"
+        >
+          <Leaf className="w-16 h-16 text-text-secondary mb-4" />
+          <h3 className="text-xl font-bold text-text-primary mb-2">No Analysis Data Found</h3>
+          <p className="text-text-secondary mb-6">Please analyze a product first.</p>
+          <Link href="/inspection">
+            <Button variant="outline">Go to Inspection</Button>
+          </Link>
+        </motion.div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

@@ -8,6 +8,7 @@ import { useAppStore } from "@/store/useAppStore";
 import { MapPin, ArrowRightLeft, ShieldCheck, Truck, Leaf, Banknote, AlertCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function SwapPage() {
   const [data, setData] = useState<SwapResponse | null>(null);
@@ -16,6 +17,10 @@ export default function SwapPage() {
   const productData = useAppStore((state) => state.productData);
 
   useEffect(() => {
+    if (!productData) {
+      setLoading(false);
+      return;
+    }
     const fetchData = async () => {
       try {
         const res = await apiService.getSwap({
@@ -33,6 +38,24 @@ export default function SwapPage() {
     };
     fetchData();
   }, [productData]);
+
+  if (!loading && !productData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-32 pb-20 px-4">
+        <motion.div
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          className="w-full max-w-lg flex flex-col items-center justify-center border border-border rounded-3xl bg-white/50 backdrop-blur-sm p-8 text-center"
+        >
+          <ArrowRightLeft className="w-16 h-16 text-text-secondary mb-4" />
+          <h3 className="text-xl font-bold text-text-primary mb-2">No Product to Match</h3>
+          <p className="text-text-secondary mb-6">Please complete inspection first.</p>
+          <Link href="/inspection">
+            <Button variant="outline">Go to Inspection</Button>
+          </Link>
+        </motion.div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

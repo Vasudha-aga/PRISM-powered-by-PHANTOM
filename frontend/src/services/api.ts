@@ -41,8 +41,14 @@ export const apiService = {
     return response.data;
   },
 
-  async getImpact(): Promise<ImpactResponse> {
-    const response = await api.get<ImpactResponse>("/impact");
+  async getImpact(params?: { phantom_score?: number; decision?: string; category?: string }): Promise<ImpactResponse> {
+    const response = await api.get<ImpactResponse>("/impact", {
+      params: {
+        phantom_score: params?.phantom_score ?? 50,
+        decision: params?.decision || "Resale",
+        category: params?.category || "Other",
+      },
+    });
     return response.data;
   },
 
