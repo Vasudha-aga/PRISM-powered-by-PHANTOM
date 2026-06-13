@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { apiService } from "@/services/api";
 import { PassportResponse } from "@/types/api";
+import { useAppStore } from "@/store/useAppStore";
 import { Fingerprint, Check, Clock, Cpu, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -11,11 +12,14 @@ export default function PassportPage() {
   const [data, setData] = useState<PassportResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const decisionData = useAppStore((state) => state.decisionData);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await apiService.getPassport();
+        const res = await apiService.getPassport({
+          decision: decisionData?.decision || undefined,
+        });
         setData(res);
       } catch (err) {
         console.error(err);
@@ -25,7 +29,7 @@ export default function PassportPage() {
       }
     };
     fetchData();
-  }, []);
+  }, [decisionData]);
 
   if (loading) {
     return (

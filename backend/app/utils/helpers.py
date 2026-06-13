@@ -1,6 +1,5 @@
 """Utility helpers shared across PRISM routes."""
 
-import random
 from PIL import Image
 import io
 
@@ -25,13 +24,13 @@ def get_grade_from_condition(condition: str) -> tuple[str, str]:
 
 
 def calculate_image_boost(image_bytes: bytes) -> int:
-    """Analyze uploaded image and return a confidence boost (0-5%).
+    """Analyze uploaded image and return a deterministic confidence boost.
 
     Args:
         image_bytes: Raw bytes of the uploaded image.
 
     Returns:
-        Integer confidence boost value.
+        Integer confidence boost value (3 or 5).
     """
     try:
         img = Image.open(io.BytesIO(image_bytes))
@@ -39,7 +38,7 @@ def calculate_image_boost(image_bytes: bytes) -> int:
         mode = img.mode
 
         if width >= 800 and height >= 800 and mode == "RGB":
-            return random.randint(4, 5)
-        return random.randint(3, 4)
+            return 5
+        return 3
     except Exception:
         return 0

@@ -1,4 +1,3 @@
-import random
 from typing import Optional
 
 from fastapi import APIRouter, File, Form, UploadFile
@@ -16,6 +15,9 @@ class AnalyzeResponse(BaseModel):
     summary: str
 
 
+CONFIDENCE_MAP = {"A": 96, "B": 88, "C": 79, "D": 65}
+
+
 @router.post("/analyze", response_model=AnalyzeResponse)
 async def analyze(
     product_name: str = Form(...),
@@ -28,47 +30,34 @@ async def analyze(
     condition = condition_description.lower()
     image_boost = 0
 
-    # Process image if uploaded
+    # If image uploaded, add flat +3 boost
     if image:
         try:
             contents = await image.read()
-            img = Image.open(io.BytesIO(contents))
-            width, height = img.size
-            mode = img.mode
-
-            # Image provides additional visual data, boost confidence
-            if width >= 800 and height >= 800 and mode == "RGB":
-                image_boost = random.randint(4, 5)
-            else:
-                image_boost = random.randint(3, 4)
+            Image.open(io.BytesIO(contents))  # validate it's a real image
+            image_boost = 3
         except Exception:
-            # If image can't be processed, continue without boost
             image_boost = 0
 
     # Grade based on condition keywords
     if "new" in condition or "perfect" in condition:
         grade = "A"
-        confidence = random.randint(95, 98)
         damage = "No visible damage"
     elif "minor" in condition or "scratch" in condition:
         grade = "B"
-        confidence = random.randint(85, 92)
         damage = "Minor cosmetic wear"
     elif "moderate" in condition or "worn" in condition:
         grade = "C"
-        confidence = random.randint(75, 82)
         damage = "Moderate wear and tear"
     elif "broken" in condition or "damaged" in condition:
         grade = "D"
-        confidence = random.randint(60, 72)
         damage = "Significant damage detected"
     else:
         grade = "B"
-        confidence = random.randint(80, 88)
         damage = "Minor wear assumed"
 
-    # Apply image boost (cap at 99)
-    confidence = min(confidence + image_boost, 99)
+    # Deterministic confidence, cap at 99
+    confidence = min(CONFIDENCE_MAP[grade] + image_boost, 99)
 
     summary = (
         f"{product_name} ({category}) graded as {grade}. "

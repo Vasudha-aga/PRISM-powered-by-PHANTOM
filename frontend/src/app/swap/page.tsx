@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { apiService } from "@/services/api";
 import { SwapResponse } from "@/types/api";
+import { useAppStore } from "@/store/useAppStore";
 import { MapPin, ArrowRightLeft, ShieldCheck, Truck, Leaf, Banknote, AlertCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,11 +13,16 @@ export default function SwapPage() {
   const [data, setData] = useState<SwapResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const productData = useAppStore((state) => state.productData);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await apiService.getSwap();
+        const res = await apiService.getSwap({
+          product_name: productData?.product_name || "Unknown Product",
+          category: productData?.category || "Other",
+          condition_description: productData?.condition_description || undefined,
+        });
         setData(res);
       } catch (err) {
         console.error(err);
@@ -26,7 +32,7 @@ export default function SwapPage() {
       }
     };
     fetchData();
-  }, []);
+  }, [productData]);
 
   if (loading) {
     return (
@@ -58,6 +64,26 @@ export default function SwapPage() {
   }
 
   if (!data) return null;
+
+  // Show no-match card if product condition is too poor
+  if (!data.match_found) {
+    return (
+      <div className="min-h-screen pt-32 pb-20 px-4 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-lg flex flex-col items-center justify-center border border-orange-500/20 rounded-3xl bg-orange-50/50 backdrop-blur-sm p-8 text-center"
+        >
+          <AlertCircle className="w-16 h-16 text-orange-500 mb-4" />
+          <h3 className="text-xl font-bold text-orange-700 mb-2">No Direct Swap Available</h3>
+          <p className="text-orange-600/80 mb-6">
+            Product condition does not meet swap requirements.
+          </p>
+          <p className="text-sm text-text-secondary">{data.status}</p>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pt-32 pb-20 px-4 relative overflow-hidden">
