@@ -1,22 +1,25 @@
 # ==========================================================
 # PRISM Powered by PHANTOM
-# Next.js + TypeScript + FastAPI + Python
+# .gitignore
 # ==========================================================
 
 # ==========================================================
-# NODE / NEXT.JS
+# NODE / NEXT.JS (Frontend)
 # ==========================================================
-
-node_modules/
-.next/
-out/
-dist/
-build/
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/dist/
+frontend/build/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
 
 # Package managers
-package-lock.json.bak
-yarn.lock.bak
-pnpm-lock.yaml.bak
+frontend/package-lock.json.bak
+frontend/yarn.lock.bak
+frontend/pnpm-lock.yaml.bak
 
 # Logs
 npm-debug.log*
@@ -25,128 +28,66 @@ yarn-error.log*
 pnpm-debug.log*
 
 # ==========================================================
-# ENVIRONMENT VARIABLES
+# PYTHON / FASTAPI (Backend)
 # ==========================================================
+backend/__pycache__/
+backend/*.py[cod]
+backend/*$py.class
 
-.env
-.env.*
-!.env.example
+# Python Virtual Environments
+backend/venv/
+backend/.venv/
+backend/env/
+backend/ENV/
 
-# ==========================================================
-# PYTHON
-# ==========================================================
+# FastAPI / Uvicorn
+backend/*.log
 
-__pycache__/
-*.py[cod]
-*$py.class
+# Environment variables
+backend/.env
+backend/.env.*
+!backend/.env.example
 
-# Compiled extensions
-*.so
+# Testing / Type Checking / Linting
+backend/.pytest_cache/
+backend/.coverage
+backend/htmlcov/
+backend/.mypy_cache/
+backend/.ruff_cache/
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+# Distribution / Packaging
+backend/.Python
+backend/build/
+backend/dist/
+backend/*.egg-info/
+backend/*.egg
 
 # ==========================================================
-# PYTHON VIRTUAL ENVIRONMENTS
+# IDES & EDITORS
 # ==========================================================
-
-venv/
-.venv/
-ENV/
-env/
-env.bak/
-venv.bak/
-
-# ==========================================================
-# FASTAPI / UVICORN
-# ==========================================================
-
-*.log
-
-# ==========================================================
-# TESTING
-# ==========================================================
-
-.pytest_cache/
-.coverage
-.coverage.*
-htmlcov/
-
-# ==========================================================
-# TYPE CHECKING
-# ==========================================================
-
-.mypy_cache/
-.pyre/
-.pytype/
-
-# ==========================================================
-# LINTING
-# ==========================================================
-
-.ruff_cache/
-
-# ==========================================================
-# JUPYTER
-# ==========================================================
-
-.ipynb_checkpoints
-
-# ==========================================================
-# IDES
-# ==========================================================
-
 .vscode/
 .idea/
 *.suo
-*.ntvs*
-*.njsproj
 *.sln
 *.sw?
+*.swp
 
 # ==========================================================
 # OPERATING SYSTEM FILES
 # ==========================================================
-
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 desktop.ini
 
 # ==========================================================
-# DATABASES
+# CACHE & TEMP FILES
 # ==========================================================
-
-*.db
-*.sqlite
-*.sqlite3
-
-# ==========================================================
-# CACHE
-# ==========================================================
-
 .cache/
-.parcel-cache/
-
-# ==========================================================
-# TEMP FILES
-# ==========================================================
-
 tmp/
 temp/
 *.tmp
@@ -155,28 +96,32 @@ temp/
 # ==========================================================
 # UPLOADS / GENERATED FILES
 # ==========================================================
-
 uploads/
 generated/
 artifacts/
 
-# ==========================================================
-# DEPLOYMENT
-# ==========================================================
+# Next.js cache
+frontend/.turbo/
 
-.vercel
-.netlify
+# Vercel
+.vercel/
 
-# ==========================================================
-# MISC
-# ==========================================================
+# Coverage reports
+coverage/
 
-*.bak
-*.swp
-*.swo
+# Python notebook checkpoints
+.ipynb_checkpoints/
 
-# ==========================================================
-# KEEP EMPTY FOLDERS
-# ==========================================================
+# Mac/Linux hidden files
+.fseventsd
 
-!.gitkeep
+# Local uploads
+backend/uploads/
+
+# Generated AI outputs
+backend/generated/
+
+# Secrets
+*.pem
+*.key
+*.crt
