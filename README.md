@@ -8,15 +8,11 @@ An AI-driven reverse logistics platform that intelligently grades returned produ
   <table>
     <tr>
       <td align="center" width="50%">
-        <b>Frontend</b><br>
         <img src="https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=nextdotjs" alt="Next.js" />
         <img src="https://img.shields.io/badge/React-19-0055FF?style=for-the-badge&logo=react" alt="React" />
         <img src="https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
         <img src="https://img.shields.io/badge/Framer-11.0-0055FF?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion" />
         <img src="https://img.shields.io/badge/Zustand-4.5-black?style=for-the-badge&logo=react" alt="Zustand" />
-      </td>
-      <td align="center" width="50%">
-        <b>Backend</b><br>
         <img src="https://img.shields.io/badge/FastAPI-0.109-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
         <img src="https://img.shields.io/badge/Python-3.10-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
         <img src="https://img.shields.io/badge/Pydantic-2.0-E92063?style=for-the-badge&logo=pydantic&logoColor=white" alt="Pydantic" />
