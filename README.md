@@ -142,7 +142,3 @@ prism-powered-by-phantom/
 └── README.md
 ```
 
----
-
-## 🛡️ License
-Proprietary & Confidential. PRISM Powered by PHANTOM. All rights reserved.
