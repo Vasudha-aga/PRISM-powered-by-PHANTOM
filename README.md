@@ -2,6 +2,8 @@
 
 An AI-driven reverse logistics platform that intelligently grades returned products, scores their recovery potential, and routes them toward the most sustainable outcome — resale, refurbishment, or recycling.
 
+**🟢 Live Demo:** [https://prism-powered-by-phantom.vercel.app](https://prism-powered-by-phantom.vercel.app)
+
 ## What It Does
 
 1. **AI Inspection** — Accepts product details and optional image upload, grades condition (A/B/C/D) with confidence scoring.
