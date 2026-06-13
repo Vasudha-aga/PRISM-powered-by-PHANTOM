@@ -2,44 +2,59 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { api } from "@/lib/api";
-import { Fingerprint, Check, Clock } from "lucide-react";
-
-interface TimelineItem {
-  stage: string;
-  status: "completed" | "active" | "pending";
-}
-
-interface PassportResponse {
-  timeline: TimelineItem[];
-}
+import { apiService } from "@/services/api";
+import { PassportResponse } from "@/types/api";
+import { Fingerprint, Check, Clock, Cpu, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function PassportPage() {
   const [data, setData] = useState<PassportResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await api.get("/passport");
-        setData(res.data);
-      } catch (error) {
-        console.error(error);
-        // Fallback demo data
-        setData({
-          timeline: [
-            { stage: "Purchased", status: "completed" },
-            { stage: "Delivered", status: "completed" },
-            { stage: "Returned", status: "completed" },
-            { stage: "AI Inspected", status: "completed" },
-            { stage: "PHANTOM Analyzed", status: "completed" },
-            { stage: "Approved for Resale", status: "active" },
-            { stage: "Second Life Achieved", status: "pending" },
-          ]
-        });
+        const res = await apiService.getPassport();
+        setData(res);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to generate Product DNA. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Fingerprint className="w-16 h-16 text-primary animate-pulse" />
+          <p className="text-xl font-medium tracking-widest uppercase">Generating Product DNA...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-32 pb-20 px-4">
+        <motion.div 
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          className="w-full max-w-lg flex flex-col items-center justify-center border border-red-500/20 rounded-3xl bg-red-50/50 backdrop-blur-sm p-8 text-center"
+        >
+          <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
+          <h3 className="text-xl font-bold text-red-700 mb-2">Passport Error</h3>
+          <p className="text-red-600/80 mb-6">{error}</p>
+          <Button onClick={() => window.location.reload()} variant="outline" className="border-red-200 text-red-600 hover:bg-red-50">
+            Retry
+          </Button>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pt-32 pb-20 px-4 flex flex-col items-center">

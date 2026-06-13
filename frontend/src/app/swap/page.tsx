@@ -2,45 +2,60 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { api } from "@/lib/api";
-import { MapPin, ArrowRightLeft, ShieldCheck, Truck, Leaf, Banknote } from "lucide-react";
+import { apiService } from "@/services/api";
+import { SwapResponse } from "@/types/api";
+import { MapPin, ArrowRightLeft, ShieldCheck, Truck, Leaf, Banknote, AlertCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
-
-interface SwapResponse {
-  match_found: boolean;
-  match_confidence: number;
-  product: string;
-  buyer_city: string;
-  seller_city: string;
-  logistics_saved: number;
-  carbon_saved: number;
-  status: string;
-}
+import { Button } from "@/components/ui/button";
 
 export default function SwapPage() {
   const [data, setData] = useState<SwapResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await api.get("/swap");
-        setData(res.data);
-      } catch (error) {
-        console.error(error);
-        setData({
-          match_found: true,
-          match_confidence: 92,
-          product: "Sony WH-1000XM5",
-          buyer_city: "Mumbai",
-          seller_city: "Pune",
-          logistics_saved: 120,
-          carbon_saved: 2.4,
-          status: "Warehouse Bypassed"
-        });
+        const res = await apiService.getSwap();
+        setData(res);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to find a swap match. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <ArrowRightLeft className="w-16 h-16 text-primary animate-pulse" />
+          <p className="text-xl font-medium tracking-widest uppercase">Searching SWAP Network...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-32 pb-20 px-4">
+        <motion.div 
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          className="w-full max-w-lg flex flex-col items-center justify-center border border-red-500/20 rounded-3xl bg-red-50/50 backdrop-blur-sm p-8 text-center"
+        >
+          <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
+          <h3 className="text-xl font-bold text-red-700 mb-2">SWAP Error</h3>
+          <p className="text-red-600/80 mb-6">{error}</p>
+          <Button onClick={() => window.location.reload()} variant="outline" className="border-red-200 text-red-600 hover:bg-red-50">
+            Retry Search
+          </Button>
+        </motion.div>
+      </div>
+    );
+  }
 
   if (!data) return null;
 

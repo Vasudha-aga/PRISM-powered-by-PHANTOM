@@ -1,27 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Upload, Scan, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react";
-import { api } from "@/lib/api";
+import { apiService } from "@/services/api";
+import { useAppStore } from "@/store/useAppStore";
 import Link from "next/link";
-
-interface AnalyzeResponse {
-  grade: string;
-  confidence: number;
-  damage: string;
-  summary: string;
-}
+import { useRouter } from "next/navigation";
 
 export default function InspectionPage() {
+  const router = useRouter();
+  const setProductData = useAppStore((state) => state.setProductData);
+  const setAnalyzeData = useAppStore((state) => state.setAnalyzeData);
+  
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<AnalyzeResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  
+  const result = useAppStore((state) => state.analyzeData);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -34,25 +35,32 @@ export default function InspectionPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
     const formData = new FormData(e.currentTarget);
-    // Remove the default empty file if no file was selected
     if (!file) {
       formData.delete("image");
     }
 
+    // Save product data to global store
+    setProductData({
+      product_name: formData.get("product_name") as string,
+      category: formData.get("category") as string,
+      return_reason: formData.get("return_reason") as string,
+      condition_description: formData.get("condition_description") as string,
+    });
+
     try {
-      const { data } = await api.post("/analyze", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const data = await apiService.analyze(formData);
       
       // Simulate scanning time for dramatic effect
       setTimeout(() => {
-        setResult(data);
+        setAnalyzeData(data);
         setLoading(false);
       }, 2500);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
+      setError("Analysis failed. Please try again.");
       setLoading(false);
     }
   };
@@ -130,7 +138,7 @@ export default function InspectionPage() {
           {/* Results/Scanning Section */}
           <div className="relative h-full min-h-[500px]">
             <AnimatePresence mode="wait">
-              {!loading && !result && (
+              {!loading && !result && !error && (
                 <motion.div 
                   key="empty"
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -138,6 +146,21 @@ export default function InspectionPage() {
                 >
                   <Scan className="w-16 h-16 text-text-secondary/20 mb-4" />
                   <p className="text-text-secondary font-medium tracking-wide">Awaiting Product Input</p>
+                </motion.div>
+              )}
+
+              {error && !loading && (
+                <motion.div 
+                  key="error"
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  className="absolute inset-0 flex flex-col items-center justify-center border border-red-500/20 rounded-3xl bg-red-50/50 backdrop-blur-sm p-8 text-center"
+                >
+                  <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
+                  <h3 className="text-xl font-bold text-red-700 mb-2">Analysis Error</h3>
+                  <p className="text-red-600/80 mb-6">{error}</p>
+                  <Button onClick={() => setError(null)} variant="outline" className="border-red-200 text-red-600 hover:bg-red-50">
+                    Try Again
+                  </Button>
                 </motion.div>
               )}
 
@@ -174,7 +197,7 @@ export default function InspectionPage() {
                 </motion.div>
               )}
 
-              {result && !loading && (
+              {result && !loading && !error && (
                 <motion.div 
                   key="result"
                   initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
@@ -214,15 +237,7 @@ export default function InspectionPage() {
                   </div>
 
                   <Link 
-                    href={`/analysis?product=${encodeURIComponent(
-                      (document.getElementById("product_name") as HTMLInputElement)?.value || ""
-                    )}&category=${encodeURIComponent(
-                      (document.getElementById("category") as HTMLInputElement)?.value || ""
-                    )}&condition=${encodeURIComponent(
-                      (document.getElementById("condition_description") as HTMLInputElement)?.value || ""
-                    )}&reason=${encodeURIComponent(
-                      (document.getElementById("return_reason") as HTMLInputElement)?.value || ""
-                    )}`}
+                    href="/analysis"
                     className="inline-flex shrink-0 items-center justify-center font-medium whitespace-nowrap outline-none select-none w-full mt-8 h-12 bg-text-primary hover:bg-black text-white rounded-xl"
                   >
                       Proceed to PHANTOM Analysis <ArrowRight className="w-4 h-4 ml-2" />
